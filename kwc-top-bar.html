@@ -1,0 +1,225 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-icons/iron-icons.html">
+
+<!--
+  Custom styles:
+    * --kwc-top-bar-bg-color (default #fff)
+    * --kwc-top-bar-color (default #000)
+    * --kwc-top-bar-box-shadow (default 0 2px 4px #aaa)
+    * --kwc-top-bar-site-width (default 250px)
+    * --kwc-top-bar-site-bg-color (default #fff)
+    * --kwc-top-bar-site-color (default #000)
+    * --kwc-top-bar-height (default 50px)
+    * --kwc-top-bar-link-menu-styles (default {} including color: --kwc-top-bar-color; background-color: --kwc-top-bar-bg-color;)
+    * --kwc-top-bar-link-menu-hover-styles (default {} including color: --kwc-top-bar-color; background-color: --kwc-top-bar-bg-color;)
+    * --kwc-top-bar-search-styles (default {} including border: none; border-bottom: 1px solid #aaa;)
+  
+  Properties:
+    * search: Should the component show a search input?
+    * query: The search query, updated for each change
+-->
+<dom-module id="kwc-top-bar">
+  <template>
+    <style>
+      :host {
+        color: var(--kwc-top-bar-color, #000);
+        background-color: var(--kwc-top-bar-bg-color, #fff);
+        box-shadow: var(--kwc-top-bar-box-shadow, 0 2px 4px #aaa);
+        z-index: 100;
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--kwc-top-bar-height, 50px);
+      }
+      
+      .top-site {
+        width: var(--kwc-top-bar-site-width, 250px);
+        color: var(--kwc-top-bar-color, #000);
+        background-color: var(--kwc-top-bar-bg-color, #fff);
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      
+      .sitename {
+        text-align: center;
+        flex-grow: 1;
+        font-size: 1.5rem;
+      }
+      
+      .top-menus {
+        display: flex;
+        flex-grow: 1;
+        padding: 0 2rem;
+      }
+      
+      .top-menu >::content ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 50px;
+      }
+      
+      .top-menu >::content a {
+        color: var(--kwc-top-bar-color, #000);
+        background-color: var(--kwc-top-bar-bg-color, #fff);
+        height: var(--kwc-top-bar-height, 50px);
+        line-height: var(--kwc-top-bar-height, 50px);
+        display: flex;
+        align-items: center;
+        padding: 0 0.5rem;
+        text-decoration: none;
+        font-weight: bold;
+        @apply(--kwc-top-bar-link-menu-styles);
+      }
+      
+      .top-menu >::content a:hover {
+        color: var(--kwc-top-bar-color, #000);
+        background-color: var(--kwc-top-bar-bg-color, #fff);
+        @apply(--kwc-top-bar-link-menu-hover-styles);
+      }
+      
+      .top-menu >::content a > span {
+        padding: 0 0.25rem;
+      }
+      
+      .top-blank {
+        flex-grow: 1;
+      }
+      
+      .top-search {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+      }
+      
+      .top-search input {
+        color: var(--kwc-top-bar-color, #000);
+        background-color: var(--kwc-top-bar-bg-color, #fff);
+        flex-grow: 1;
+        border: none;
+        border-bottom: 1px solid #aaa;
+        @apply(--kwc-top-bar-search-styles);
+      }
+      
+      .top-search-box {
+        background-color: var(--kwc-top-bar-bg-color, #fff);
+        color: var(--kwc-top-bar-color, #000);
+        box-shadow: var(--kwc-top-bar-box-shadow, 0 2px 4px #aaa);
+        position: fixed;
+        top: 50px;
+        left: 0;
+        right: 0;
+        z-index: 101;
+        padding: 0.5rem;
+        display: flex;
+      }
+      
+      .top-search-container {
+        margin: auto;
+      }
+    </style>
+
+    <a href="[[sitehome]]" class="top-site">
+      <img src="[[logo]]" alt="Logo">
+      <span class="sitename">{{sitename}}</span>
+    </a>
+
+    <div class="top-menus">
+      <nav class="top-menu top-menu-left">
+        <content select=".top-bar-left-menu"></content>
+      </nav>
+
+      <div class="top-blank" hidden$="[[search]]"></div>
+
+      <label class="top-search" hidden$="[[!search]]">
+        <input type="search" id="search" value="{{_query::input}}" placeholder="[[searchPlaceholder]]">
+        <iron-icon icon="icons:search"></iron-icon>
+      </label>
+
+      <div class="top-menu top-menu-right">
+        <content select=".top-bar-right-menu"></content>
+      </div>
+    </div>
+
+    <div class="top-search-box" hidden$="[[_searchBoxHidden]]">
+      <div class="top-search-container">
+        <div class="tips">
+          <content select=".top-bar-search-tips"></content>
+        </div>
+
+        <div class="result">
+          <content select=".top-bar-search-result"></content>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: "kwc-top-bar",
+
+      properties: {
+        search: {
+          type: Boolean,
+          value: false
+        },
+        searchPlaceholder: {
+          type: String,
+          value: null,
+        },
+        delaySearch: {
+          type: Number,
+          value: 0
+        },
+        delayCloseSearch: {
+          type: Number,
+          value: 0
+        },
+        _query: {
+          type: String,
+          value: "",
+          observer: "_queryChanged"
+        },
+        _searchBoxHidden: {
+          type: Boolean,
+          value: true
+        }
+      },
+      
+      listeners: {
+        "search.focus": "_searchFocus",
+        "search.blur": "_searchBlur",
+      },
+      
+      _queryChanged: function(value) {
+        if (this._queryTimer) {
+          clearTimeout(this._queryTimer)
+        }
+        var that = this
+        this._queryTimer = setTimeout(function(){
+          that.fire("search", value)
+        }, this.delaySearch)
+      },
+      
+      _searchFocus: function(e) {
+        if (this._closeTimer) {
+          clearTimeout(this._closeTimer)
+          this._closeTimer = null
+        }
+        this._searchBoxHidden = false
+      },
+      
+      _searchBlur: function(e) {
+        var that = this
+        this._closeTimer = setTimeout(function() {
+          that._searchBoxHidden = true
+        }, this.delayCloseSearch)
+      }
+    })
+  </script>
+</dom-module>

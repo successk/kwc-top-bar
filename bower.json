@@ -1,0 +1,28 @@
+{
+  "name": "kwc-top-bar",
+  "homepage": "https://github.com/successk/kwc-top-bar",
+  "authors": [
+    "Gaëtan Rizio <gaetan@rizio.fr>"
+  ],
+  "description": "A component providing a top-bar with menus and search management",
+  "version": "0.1.0",
+  "main": "kwc-top-bar.html",
+  "moduleType": [],
+  "keywords": [
+    "polymer",
+    "web-components",
+    "top-bar"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-icons": "PolymerElements/iron-icons#^1.1.3"
+  }
+}

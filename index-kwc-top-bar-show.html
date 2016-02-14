@@ -1,0 +1,152 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="kwc-top-bar.html">
+
+
+<dom-module id="index-kwc-top-bar-show">
+  <template>
+    <style>
+      :root {
+        --kwc-top-bar-bg-color: #212121;
+        --kwc-top-bar-color: #fafafa;
+        --kwc-top-bar-box-shadow: 0 2px 4px #9e9e9e;
+        --kwc-top-bar-link-menu-hover-styles: {
+          background-color: #fafafa;
+          color: #212121;
+        }
+        --kwc-top-bar-search-styles: {
+          border-bottom: 1px dotted #fff;
+        }
+      }
+      
+      /* Search result configuration */
+      .top-bar-search-result a {
+        text-decoration: none;
+      }
+      
+      .top-bar-search-result .user a {
+        color: #fff;
+      }
+      
+      .top-bar-search-result .page a {
+        color: #f00;
+      }
+      
+      .top-bar-search-result .faq a {
+        color: #0f0;
+      }
+    </style>
+
+    <kwc-top-bar logo="http://placehold.it/50x50" sitename="Example" sitehome="/" search search-placeholder="Search in my app" delay-search="500" delay-close-search="1000" id="topbar">
+      <div class="top-bar-left-menu">
+        <ul>
+          <li>
+            <a href="#">
+              <iron-icon icon="icons:home"></iron-icon>
+              <span>Home</span>
+            </a>
+          </li>
+          <li><a href="#">Presentation</a></li>
+          <li>
+            <a href="#">
+              <iron-icon icon="communication:contact-mail"></iron-icon>
+              <span>Contact</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="top-bar-right-menu">
+        <ul>
+          <li>
+            <a href="#">
+            <span>Login</span>
+            <iron-icon icon="icons:account-circle"></iron-icon>
+          </a>
+          </li>
+          <li><a href="#">
+          <span>Register</span>
+          <iron-icon icon="icons:account-box"></iron-icon>
+        </a></li>
+        </ul>
+      </div>
+
+      <div class="top-bar-search-tips">
+        <ul>
+          <li>Search "user [user]" to search users only</li>
+          <li>Search "page [page]" to search pages only</li>
+          <li>Search "[search]" to search anything</li>
+        </ul>
+      </div>
+
+      <div class="top-bar-search-result">
+        <ul>
+          <template is="dom-repeat" items="[[searchResult]]">
+            <li class$="[[item.type]]"><a href="[[item.link]]">[[item.value]]</a></li>
+          </template>
+        </ul>
+      </div>
+    </kwc-top-bar>
+  </template>
+  <script>
+    var possibleResults = [
+      {type: "user", url: "#", value:"Kit"},
+      {type: "user", url: "#", value:"Ykaly"},
+      {type: "user", url: "#", value:"Iperu"},
+      {type: "user", url: "#", value:"Kaluild"},
+      {type: "user", url: "#", value:"Rayoet"},
+      {type: "user", url: "#", value:"Queskel"},
+      {type: "user", url: "#", value:"Vor'ani"},
+      {type: "page", url: "#", value:"Presentation"},
+      {type: "page", url: "#", value:"How are we"},
+      {type: "page", url: "#", value:"Contact"},
+      {type: "page", url: "#", value:"Home"},
+      {type: "faq", url: "#", value:"Where am I?"},
+      {type: "faq", url: "#", value:"Who am I?"},
+      {type: "faq", url: "#", value:"What the day?"},
+      {type: "faq", url: "#", value:"What the answer?"},
+    ]
+    
+    Polymer({
+      is:"index-kwc-top-bar-show",
+
+      properties: {
+        searchResult: {
+          type: Array,
+          value: []
+        }
+      },
+      
+      listeners: {
+        "topbar.search": "_doSearch"
+      },
+      
+      _doSearch: function(e) {
+        var searchQuery = e.detail
+        if (!searchQuery) {
+          this.searchResult = []
+          return
+        }
+        // Need to use a real server in a real application
+        var user = "user"
+        var page = "page"
+        var query = searchQuery.trim().toLowerCase()
+        if (query.substr(0, user.length) === user) {
+          query = query.substr(user.length).trim()
+          this.searchResult = possibleResults
+            .filter(function(e){ return e.type === "user" })
+            .filter(function(e){ return e.value.toLowerCase().indexOf(query) >= 0 })
+        } else if (query.substr(0, page.length) === page) {
+          query = query.substr(page.length).trim()
+          this.searchResult = possibleResults
+            .filter(function(e){ return e.type === "page" })
+            .filter(function(e){ return e.value.toLowerCase().indexOf(query) >= 0 })
+        } else {
+          this.searchResult = possibleResults
+            .filter(function(e){ return e.value.toLowerCase().indexOf(query) >= 0 })
+        }
+      }
+    })
+  </script>
+</dom-module>
